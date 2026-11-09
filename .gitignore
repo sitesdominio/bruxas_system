@@ -22,3 +22,7 @@ node_modules
 # Cópia de referência do projeto Lovable (mantida só na branch main / projeto original)
 .reference-lovable/
 lovable.zip
+
+# Gerados pelo TypeScript / Next.js
+*.tsbuildinfo
+next-env.d.ts
