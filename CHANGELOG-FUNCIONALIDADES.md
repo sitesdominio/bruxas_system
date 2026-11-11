@@ -9,10 +9,11 @@ Legenda: ✅ funciona e foi testado · ⚠️ depende de configuração/migratio
 - ✅ **Esgotou, sai do site**: ao vender o último item o produto é despublicado automaticamente.
 - ✅ **Registrar venda** (−1 estoque, +1 venda) de forma atômica; não deixa vender acima do estoque.
 - ✅ **Vitrine** (`/` e `/banhos`) lê só produtos publicados e com estoque. Sem estoque/vendas expostos ao público.
-- ⚠️ Requer aplicar `supabase/migrations/20261110000000_products_inventory.sql` (não aplicada). Até lá, a vitrine mostra os 3 produtos de demonstração 🧪 e a gestão avisa que a tabela não existe.
+- ✅ Migration `20261110000000_products_inventory.sql` **aplicada** no Supabase `supabase-gray-dog` e validada no banco real (8/8 verificações em transação revertida: regras de estoque, venda, RLS de equipe/cliente/anônimo). Se o banco não responder, a vitrine cai nos 3 produtos de demonstração 🧪.
+- ⚠️ Aviso do Advisor do Supabase (ERROR `security_definer_view`) em `products_public`: é intencional, a view filtra linhas/colunas para o público sem expor estoque e vendas.
 - ⚠️ Gestão exige conta com papel em `user_roles` (a primeira conta de equipe é criada manualmente no Supabase).
 - Limites atuais: "vendas" são registradas manualmente (o checkout/Mercado Pago ainda não existe); o carrinho não confere estoque; os demais cards de `/gestao` (agenda, pedidos, receita) continuam 🧪 demonstrativos.
-- Testes: banco 20/20 (PGlite), validação 6/6, tela com Supabase simulado 17/17. Falta validar no Supabase real.
+- Testes: banco 20/20 (PGlite) + 8/8 no Supabase real, validação 6/6, tela com Supabase simulado 17/17. Falta testar a tela logada no Supabase real (nenhuma conta de equipe ainda).
 
 ## 2026-11-10 — Site e carrinho
 - ✅ Busca de produtos no header; página `/banhos` só com produtos; produtos já na primeira tela.
