@@ -118,3 +118,33 @@ button, input, select { font:inherit; } button { cursor:pointer; } .site-shell {
 
 @media(max-width:800px){.hero{grid-template-columns:minmax(0,1fr);padding:22px 20px 16px;min-height:auto}.hero-symbol{justify-self:center;margin:0 auto}}
 .home-products .outline-button{white-space:nowrap;padding:12px 18px;text-decoration:none}
+
+/* ===== Carrinho no novo design ===== */
+.overlay{z-index:60;background:rgba(14,6,26,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.side-panel{background:linear-gradient(180deg,#3a1a5c 0,#24113a 100%);color:var(--mist);border-left:1px solid rgba(243,200,255,.28);box-shadow:-24px 0 70px rgba(10,3,20,.5);padding:34px 28px;overflow-y:auto;display:flex;flex-direction:column;border-radius:24px 0 0 24px}
+.side-panel .close-panel{top:22px;right:22px;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(243,200,255,.35);color:#fff}
+.side-panel .close-panel:hover{background:rgba(243,200,255,.16)}
+.side-panel .close-panel svg{width:18px}
+.side-panel h2{font-size:38px;margin:8px 0 22px;color:#fff}
+.side-panel .section-kicker{margin-top:6px}
+.side-panel .cart-item{gap:14px;padding:16px;margin-bottom:10px;border:1px solid rgba(243,200,255,.22);border-radius:16px;background:rgba(255,255,255,.07)}
+.side-panel .cart-item b{font-size:17px;color:#fff}
+.side-panel .cart-item small{color:#d3c0dc}
+.side-panel .cart-item strong{background:rgba(241,139,255,.22);color:#fff;border-radius:999px;padding:5px 12px;font-size:14px;white-space:nowrap}
+.side-panel .cart-item button{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(243,200,255,.3);color:#fff}
+.side-panel .cart-item button:hover{background:rgba(243,200,255,.18)}
+.side-panel .cart-total{margin-top:6px;padding:18px 4px;border-top:1px solid rgba(243,200,255,.25);color:#eadcf0;font-size:14px}
+.side-panel .cart-total strong{background:none;color:#fff;font-size:20px;padding:0}
+.side-panel .delivery-label{color:#d8c4e2;font-size:12px}
+.side-panel .delivery-label select{border:1px solid rgba(243,200,255,.4);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;padding:13px 14px}
+.side-panel .delivery-label select option{color:#241233}
+.side-panel .primary-button.full{margin-top:auto;width:100%}
+.side-panel .delivery-label+.primary-button{margin-top:20px}
+.side-panel .secure-note{color:#cdb9d8;text-align:center;margin:12px 0 0;font-size:12px}
+.side-panel .empty-cart{color:#dccbe5;padding-top:70px}
+.side-panel .empty-cart .outline-button{color:#fff;border-color:rgba(243,200,255,.5)}
+@media(max-width:600px){.side-panel{border-radius:0;padding:28px 18px}.side-panel h2{font-size:32px}}
+.side-panel .empty-cart{display:flex;flex-direction:column;align-items:center;gap:6px}
+.side-panel .empty-cart p{margin:0 0 14px}
+.toast{z-index:70;border-radius:999px;background:rgba(58,26,92,.94);color:#fff;border:1px solid rgba(243,200,255,.4);padding:13px 22px;box-shadow:0 12px 36px rgba(10,3,20,.5);backdrop-filter:blur(10px)}
+.toast svg{color:var(--lilac)}
