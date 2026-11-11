@@ -148,3 +148,34 @@ button, input, select { font:inherit; } button { cursor:pointer; } .site-shell {
 .side-panel .empty-cart p{margin:0 0 14px}
 .toast{z-index:70;border-radius:999px;background:rgba(58,26,92,.94);color:#fff;border:1px solid rgba(243,200,255,.4);padding:13px 22px;box-shadow:0 12px 36px rgba(10,3,20,.5);backdrop-filter:blur(10px)}
 .toast svg{color:var(--lilac)}
+
+/* ===== Gestão: controle de produtos ===== */
+.products-manager{margin-top:14px}
+.primary-button.small{padding:11px 18px;gap:8px}
+.pm-note{font:13px/1.5 Arial;color:#cdbbd4;margin:0 0 14px}.pm-note a{color:var(--lilac)}
+.pm-error{color:#ff9db1}
+.pm-summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.pm-summary span{font:12px Arial;color:#cdbbd4;border:1px solid var(--line);border-radius:999px;padding:7px 14px}.pm-summary b{color:#fff;font-size:14px}
+.pm-table{border-top:1px solid rgba(243,200,255,.18)}
+.pm-head,.pm-row{display:grid;grid-template-columns:minmax(150px,2fr) .9fr 1fr .7fr .7fr auto;gap:12px;align-items:center;padding:13px 4px;border-bottom:1px solid rgba(243,200,255,.14);font:13px Arial}
+.pm-head{color:#a995ad;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.pm-name strong{display:block;font:400 16px Georgia,serif;color:#fff}.pm-name small{color:#a995ad;font-size:11px}
+.pm-zero{color:#ff9db1}
+.pm-switch{width:44px;height:24px;border-radius:999px;border:1px solid rgba(243,200,255,.4);background:rgba(255,255,255,.1);position:relative;padding:0;transition:.2s}
+.pm-switch i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#d8c4e2;transition:.2s}
+.pm-switch.on{background:#a24fd0;border-color:#f18bff}.pm-switch.on i{left:22px;background:#fff}
+.pm-switch:disabled{opacity:.4;cursor:not-allowed}
+.pm-actions{display:flex;gap:6px}
+.pm-actions button{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(243,200,255,.3);background:none;color:#fff}
+.pm-actions button:hover:not(:disabled){background:rgba(243,200,255,.16)}.pm-actions button:disabled{opacity:.35;cursor:not-allowed}.pm-actions svg{width:15px}
+.pm-overlay{position:fixed;inset:0;z-index:60;background:rgba(10,4,20,.7);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px}
+.pm-form{position:relative;width:min(520px,100%);max-height:92vh;overflow:auto;padding:32px 28px;border-radius:22px;background:linear-gradient(180deg,#3a1a5c,#24113a);border:1px solid rgba(243,200,255,.3);display:flex;flex-direction:column;gap:14px;color:#fff}
+.pm-form label{display:flex;flex-direction:column;gap:7px;font:12px Arial;color:#d8c4e2}
+.pm-form input:not([type=checkbox]),.pm-form textarea{border:1px solid rgba(243,200,255,.4);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;padding:12px 14px;font:14px Arial;outline:none;resize:vertical}
+.pm-form input:focus,.pm-form textarea:focus{border-color:#f18bff}
+.pm-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pm-check{flex-direction:row!important;align-items:center;gap:10px!important}.pm-check small{color:#a995ad}
+.pm-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(243,200,255,.35);background:none;color:#fff;display:grid;place-items:center}.pm-close svg{width:16px}
+.pm-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}.pm-buttons button{width:auto}
+@media(max-width:800px){.pm-head{display:none}.pm-row{grid-template-columns:1fr 1fr;row-gap:8px}.pm-name{grid-column:1/-1}.pm-actions{grid-column:1/-1}.pm-two{grid-template-columns:1fr}}
+.management-grid{grid-template-columns:1fr}

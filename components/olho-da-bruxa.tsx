@@ -9,7 +9,8 @@ import { CalendarDays, ChevronRight, Menu, MessageCircle, Minus, Package, Plus, 
 
 type Product = { id: number; name: string; description: string; price: number; category: string; tag: string }
 
-const products: Product[] = [
+// Vitrine de demonstração: usada apenas se o banco (view products_public) não estiver disponível.
+const demoProducts: Product[] = [
   { id: 1, name: 'Banho de Proteção', description: 'Ervas de alecrim, arruda e lavanda para fechar o corpo.', price: 89, category: 'Banhos', tag: 'Mais pedido' },
   { id: 2, name: 'Banho de Prosperidade', description: 'Canela, louro e manjericão para abrir caminhos.', price: 99, category: 'Banhos', tag: 'Novo' },
   { id: 3, name: 'Banho de Amor', description: 'Rosas, hibisco e baunilha para despertar o coração.', price: 109, category: 'Banhos', tag: 'Ritual' },
@@ -24,6 +25,27 @@ const services = [
 export function OlhoDaBruxa({ catalogOnly = false }: { catalogOnly?: boolean }) {
   const [cart, setCart] = useState<number[]>([])
   const crossRef = useRef<HTMLDivElement>(null)
+  const [products, setProducts] = useState<Product[]>([])
+  const [catalogState, setCatalogState] = useState<'loading' | 'ready' | 'demo'>('loading')
+
+  // Vitrine: só produtos publicados e com estoque (view products_public). Se o banco não responder, usa a demonstração.
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const { data, error } = await createClient().from('products_public').select('id,name,description,category,tag,price').order('id')
+        if (!active) return
+        if (error) throw error
+        setProducts((data ?? []).map((item) => ({ ...item, price: Number(item.price) })) as Product[])
+        setCatalogState('ready')
+      } catch {
+        if (!active) return
+        setProducts(demoProducts)
+        setCatalogState('demo')
+      }
+    })()
+    return () => { active = false }
+  }, [])
 
   // Efeito 3D da cruz: inclina/gira conforme a rolagem (e levemente com o mouse). Respeita prefers-reduced-motion.
   useEffect(() => {
@@ -62,8 +84,8 @@ export function OlhoDaBruxa({ catalogOnly = false }: { catalogOnly?: boolean }) 
   const [authError, setAuthError] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
 
-  const cartItems = useMemo(() => products.filter((product) => cart.includes(product.id)), [cart])
-  const visibleProducts = useMemo(() => products.filter((product) => `${product.name} ${product.description}`.toLowerCase().includes(searchTerm.trim().toLowerCase())), [searchTerm])
+  const cartItems = useMemo(() => products.filter((product) => cart.includes(product.id)), [cart, products])
+  const visibleProducts = useMemo(() => products.filter((product) => `${product.name} ${product.description}`.toLowerCase().includes(searchTerm.trim().toLowerCase())), [searchTerm, products])
   const total = cartItems.reduce((sum, item) => sum + item.price, 0)
 
   function go(tab: 'inicio' | 'banhos' | 'agenda') {
@@ -150,7 +172,7 @@ export function OlhoDaBruxa({ catalogOnly = false }: { catalogOnly?: boolean }) 
         <div className="hero-symbol" aria-hidden="true"><div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="hero-stage"><div className="hero-logo-frame" ref={crossRef}><Image className="cross-depth" src="/logo-anubis-olho.png" alt="" width={420} height={420} /><Image className="cross-face" src="/logo-anubis-olho.png" alt="" width={420} height={420} priority /></div></div></div>
       </section>}
 
-      <section className={`products-section ${catalogOnly ? 'catalog-page' : 'home-products'}`} id="banhos"><div className="section-heading"><div>{catalogOnly && <p className="section-kicker">Feitos à mão · enviados com intenção</p>}<h2>{catalogOnly ? <>Todos os <em>produtos</em></> : <>Banhos <em>rituais</em></>}</h2></div>{catalogOnly ? <div className="catalog-actions"><Link className="outline-button" href="/">Voltar ao início</Link><Link className="primary-button" href="/#agenda">Agendar horário <CalendarDays /></Link></div> : <Link className="outline-button" href="/banhos">Ver todos <ChevronRight /></Link>}</div>{visibleProducts.length ? <div className="product-grid">{visibleProducts.map((product, index) => <article className="product-card" key={product.id}><div className={`product-art art-${index % 3}`}><span>{product.tag}</span><div className="botanical" /></div><div className="product-info"><div><h3>{product.name}</h3><p>{product.description}</p></div><strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong></div><button className="add-button" onClick={() => addToCart(product)}>Adicionar ao carrinho <Plus /></button></article>)}</div> : <p className="search-empty">Nenhum produto encontrado para “{searchTerm}”.</p>}</section>
+      <section className={`products-section ${catalogOnly ? 'catalog-page' : 'home-products'}`} id="banhos"><div className="section-heading"><div>{catalogOnly && <p className="section-kicker">Feitos à mão · enviados com intenção</p>}<h2>{catalogOnly ? <>Todos os <em>produtos</em></> : <>Banhos <em>rituais</em></>}</h2></div>{catalogOnly ? <div className="catalog-actions"><Link className="outline-button" href="/">Voltar ao início</Link><Link className="primary-button" href="/#agenda">Agendar horário <CalendarDays /></Link></div> : <Link className="outline-button" href="/banhos">Ver todos <ChevronRight /></Link>}</div>{visibleProducts.length ? <div className="product-grid">{visibleProducts.map((product, index) => <article className="product-card" key={product.id}><div className={`product-art art-${index % 3}`}><span>{product.tag}</span><div className="botanical" /></div><div className="product-info"><div><h3>{product.name}</h3><p>{product.description}</p></div><strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong></div><button className="add-button" onClick={() => addToCart(product)}>Adicionar ao carrinho <Plus /></button></article>)}</div> : <p className="search-empty">{catalogState === 'loading' ? 'Carregando produtos…' : searchTerm.trim() ? <>Nenhum produto encontrado para “{searchTerm}”.</> : 'Novos produtos chegando em breve.'}</p>}</section>
 
       {!catalogOnly && <section className="intro-section" id="rituais"><div><p className="section-kicker">A casa</p><h2>Entre, a noite<br /><em>é sua.</em></h2></div><p className="intro-copy">Na Olho da Bruxa, cada mistura é preparada com intenção. Escolha um banho, marque um encontro ou simplesmente respire. O seu tempo também é sagrado.</p></section>}
 
