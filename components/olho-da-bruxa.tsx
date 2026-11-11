@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { StarrySky } from './starry-sky'
 import { CalendarDays, ChevronRight, Menu, MessageCircle, Minus, Package, Plus, Search, ShoppingBag, Sparkles, Star, UserRound, X } from 'lucide-react'
@@ -23,6 +23,31 @@ const services = [
 
 export function OlhoDaBruxa({ catalogOnly = false }: { catalogOnly?: boolean }) {
   const [cart, setCart] = useState<number[]>([])
+  const crossRef = useRef<HTMLDivElement>(null)
+
+  // Efeito 3D da cruz: inclina/gira conforme a rolagem (e levemente com o mouse). Respeita prefers-reduced-motion.
+  useEffect(() => {
+    const el = crossRef.current
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let frame = 0
+    let pointerX = 0
+    const update = () => {
+      frame = 0
+      const y = window.scrollY
+      const ry = Math.sin(y / 240) * 32 + pointerX * 8
+      const rx = Math.min(y / 28, 16) - 4
+      el.style.setProperty('--ry', `${ry.toFixed(2)}deg`)
+      el.style.setProperty('--rx', `${rx.toFixed(2)}deg`)
+      el.style.setProperty('--ty', `${(-Math.min(y, 600) * 0.06).toFixed(1)}px`)
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
+    const onPointer = (event: PointerEvent) => { pointerX = (event.clientX / window.innerWidth - 0.5) * 2; schedule() }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('pointermove', onPointer, { passive: true })
+    return () => { window.removeEventListener('scroll', schedule); window.removeEventListener('pointermove', onPointer); if (frame) cancelAnimationFrame(frame) }
+  }, [])
+
   const [showCart, setShowCart] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -110,21 +135,22 @@ export function OlhoDaBruxa({ catalogOnly = false }: { catalogOnly?: boolean }) 
       <header className="site-header">
         <button className="mobile-trigger" aria-label="Abrir menu" onClick={() => setMobileMenu(!mobileMenu)}>{mobileMenu ? <X /> : <Menu />}</button>
         <Link className="brand" href="/"><Image className="brand-logo header-logo" src="/logo-anubis-olho.png" alt="Olho da Bruxa" width={122} height={58} priority /><span className="sr-only">Olho da Bruxa</span></Link>
-        <label className="product-search"><Search aria-hidden="true" /><input type="search" aria-label="Buscar produtos" placeholder="Buscar produtos" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />{searchTerm && <button type="button" aria-label="Limpar busca" onClick={() => setSearchTerm('')}><X /></button>}</label>
         <nav className={mobileMenu ? 'main-nav open' : 'main-nav'} aria-label="Navegação principal">
           <Link className={!catalogOnly ? 'active' : ''} href="/">Início</Link>
           <Link className={catalogOnly ? 'active' : ''} href="/banhos">Banhos</Link>
-          <button onClick={() => { setShowLogin(true); setMobileMenu(false) }}>Minha conta</button>
+          <Link href="/#agenda" onClick={() => setMobileMenu(false)}>Agendar</Link>
+          <button className="nav-account" onClick={() => { setShowLogin(true); setMobileMenu(false) }}>Minha conta</button>
         </nav>
+        <label className="product-search"><Search aria-hidden="true" /><input type="search" aria-label="Buscar produtos" placeholder="Buscar produtos" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />{searchTerm && <button type="button" aria-label="Limpar busca" onClick={() => setSearchTerm('')}><X /></button>}</label>
         <div className="header-actions"><button aria-label="Minha conta" onClick={() => setShowLogin(true)}><UserRound /></button><button className="cart-button" aria-label="Abrir carrinho" onClick={() => setShowCart(true)}><ShoppingBag /><span>{cart.length}</span></button></div>
       </header>
 
       {!catalogOnly && <section className="hero" id="inicio">
-        <div className="hero-copy"><p className="eyebrow"><Sparkles /> Rituais para o seu caminho</p><h1>O que está embaixo<br /><em>é como o que está em cima.</em></h1><p className="hero-text">Um espaço de cuidado, magia e reconexão. Encontre o ritual que conversa com a sua lua.</p><div className="hero-actions"><Link className="primary-button" href="/banhos">Conheça os banhos <ChevronRight /></Link><button className="text-button" onClick={() => go('agenda')}>Agende seu horário <CalendarDays /></button></div></div>
-        <div className="hero-symbol" aria-hidden="true"><div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="hero-logo-frame"><Image src="/logo-anubis-olho.png" alt="" width={420} height={420} priority /></div><p>INTUIÇÃO · PRESENÇA · TRANSFORMAÇÃO</p></div>
+        <div className="hero-copy"><p className="eyebrow"><Sparkles /> Banhos e atendimentos espirituais</p><h1>O que está embaixo<br /><em>é como o que está em cima.</em></h1><p className="hero-text">Banhos rituais feitos à mão e atendimentos individuais, com intenção em cada detalhe.</p><div className="hero-actions"><Link className="primary-button" href="/banhos">Conheça os banhos <ChevronRight /></Link><Link className="ghost-button" href="/#agenda">Agendar horário <CalendarDays /></Link></div></div>
+        <div className="hero-symbol" aria-hidden="true"><div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="hero-stage"><div className="hero-logo-frame" ref={crossRef}><Image className="cross-depth" src="/logo-anubis-olho.png" alt="" width={420} height={420} /><Image className="cross-face" src="/logo-anubis-olho.png" alt="" width={420} height={420} priority /></div></div></div>
       </section>}
 
-      <section className={`products-section ${catalogOnly ? 'catalog-page' : 'home-products'}`} id="banhos"><div className="section-heading"><div><p className="section-kicker">Feitos à mão · enviados com intenção</p><h2>{catalogOnly ? <>Todos os <em>produtos</em></> : <>Banhos <em>rituais</em></>}</h2></div>{catalogOnly ? <div className="catalog-actions"><Link className="outline-button" href="/">Voltar ao início</Link><Link className="primary-button" href="/#agenda">Agendar horário <CalendarDays /></Link></div> : <Link className="outline-button" href="/banhos">Ver todos <ChevronRight /></Link>}</div>{visibleProducts.length ? <div className="product-grid">{visibleProducts.map((product, index) => <article className="product-card" key={product.id}><div className={`product-art art-${index % 3}`}><span>{product.tag}</span><div className="botanical" /></div><div className="product-info"><div><h3>{product.name}</h3><p>{product.description}</p></div><strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong></div><button className="add-button" onClick={() => addToCart(product)}>Adicionar ao carrinho <Plus /></button></article>)}</div> : <p className="search-empty">Nenhum produto encontrado para “{searchTerm}”.</p>}</section>
+      <section className={`products-section ${catalogOnly ? 'catalog-page' : 'home-products'}`} id="banhos"><div className="section-heading"><div>{catalogOnly && <p className="section-kicker">Feitos à mão · enviados com intenção</p>}<h2>{catalogOnly ? <>Todos os <em>produtos</em></> : <>Banhos <em>rituais</em></>}</h2></div>{catalogOnly ? <div className="catalog-actions"><Link className="outline-button" href="/">Voltar ao início</Link><Link className="primary-button" href="/#agenda">Agendar horário <CalendarDays /></Link></div> : <Link className="outline-button" href="/banhos">Ver todos <ChevronRight /></Link>}</div>{visibleProducts.length ? <div className="product-grid">{visibleProducts.map((product, index) => <article className="product-card" key={product.id}><div className={`product-art art-${index % 3}`}><span>{product.tag}</span><div className="botanical" /></div><div className="product-info"><div><h3>{product.name}</h3><p>{product.description}</p></div><strong>R$ {product.price.toFixed(2).replace('.', ',')}</strong></div><button className="add-button" onClick={() => addToCart(product)}>Adicionar ao carrinho <Plus /></button></article>)}</div> : <p className="search-empty">Nenhum produto encontrado para “{searchTerm}”.</p>}</section>
 
       {!catalogOnly && <section className="intro-section" id="rituais"><div><p className="section-kicker">A casa</p><h2>Entre, a noite<br /><em>é sua.</em></h2></div><p className="intro-copy">Na Olho da Bruxa, cada mistura é preparada com intenção. Escolha um banho, marque um encontro ou simplesmente respire. O seu tempo também é sagrado.</p></section>}
 
